@@ -166,4 +166,7 @@ def serve_downloaded_file(folder, filename):
 
 # ---------- Run ----------
 if __name__ == '__main__':
-    app.run(debug=True,port=8080)
+
+
+    port = int(os.environ.get('PORT', 8080))  # Use Render-provided PORT or default to 8080 for local testing
+    app.run(host='0.0.0.0', port=port, debug=True)  # Bind to 0.0.0.0
