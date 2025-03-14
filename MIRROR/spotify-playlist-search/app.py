@@ -6,8 +6,8 @@ import base64
 from yt_dlp import YoutubeDL
 
 # ---------- Configuration ----------
-CLIENT_ID = '73bb00fecb6e4571abec1ccd304608e0'
-CLIENT_SECRET = '8da7f7a0a8b348298e8f4d41563594a7'
+CLIENT_ID = 'YOUR_ID'
+CLIENT_SECRET = 'YOUR_SECRET'
 BASE_DOWNLOAD_DIR = 'songs'
 os.makedirs(BASE_DOWNLOAD_DIR, exist_ok=True)
 
