@@ -170,16 +170,14 @@ def serve_downloaded_file(folder, filename):
 
 #testing routes
 
-
-@app.route('/api/test-curl', methods=['GET'])
-def test_curl():
+@app.route('/api/test-yt-version', methods=['GET'])
+def test_yt_version():
     try:
-        # Try to make a HEAD request to YouTube
-        output = subprocess.check_output(['curl', '-I', 'https://www.youtube.com'], stderr=subprocess.STDOUT)
+        output = subprocess.check_output(['yt-dlp', '--version'], stderr=subprocess.STDOUT)
         return jsonify({"status": "success", "output": output.decode()})
     except subprocess.CalledProcessError as e:
-        # If it fails, capture the output
         return jsonify({"status": "error", "output": e.output.decode()})
+
 
 
 
