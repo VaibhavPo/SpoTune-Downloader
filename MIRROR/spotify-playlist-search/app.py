@@ -4,11 +4,17 @@ import os
 import requests
 import base64
 from yt_dlp import YoutubeDL
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 
 # ---------- Configuration ----------
-CLIENT_ID = 'YOUR_ID'
-CLIENT_SECRET = 'YOUR_SECRET'
-BASE_DOWNLOAD_DIR = 'songs'
+CLIENT_ID = os.getenv('CLIENT_ID')
+CLIENT_SECRET = os.getenv('CLIENT_SECRET')
+BASE_DOWNLOAD_DIR = os.getenv('BASE_DOWNLOAD_DIR', 'songs')  # Default to 'songs' if not provided
+
 os.makedirs(BASE_DOWNLOAD_DIR, exist_ok=True)
 
 # ---------- Flask Setup ----------
