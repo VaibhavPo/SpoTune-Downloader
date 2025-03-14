@@ -5,6 +5,8 @@ import requests
 import base64
 from yt_dlp import YoutubeDL
 from dotenv import load_dotenv
+import subprocess
+from flask import jsonify
 
 # Load environment variables from .env file
 load_dotenv()
@@ -163,6 +165,27 @@ def serve_downloaded_file(folder, filename):
         return send_from_directory(folder_path, filename, as_attachment=True)
     except FileNotFoundError:
         return jsonify({"status": "error", "message": "File not found."})
+
+
+
+#testing routes
+
+
+@app.route('/api/test-curl', methods=['GET'])
+def test_curl():
+    try:
+        # Try to make a HEAD request to YouTube
+        output = subprocess.check_output(['curl', '-I', 'https://www.youtube.com'], stderr=subprocess.STDOUT)
+        return jsonify({"status": "success", "output": output.decode()})
+    except subprocess.CalledProcessError as e:
+        # If it fails, capture the output
+        return jsonify({"status": "error", "output": e.output.decode()})
+
+
+
+
+
+
 
 # ---------- Run ----------
 if __name__ == '__main__':
