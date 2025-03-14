@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>🎶 Music Player App</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #e0eafc, #cfdef3);
+            color: #333;
+            margin: 0;
+        }
+
+        h1,
+        h2 {
+            text-align: center;
+            color: #222;
+            margin-bottom: 10px;
+        }
+
+        #playlists,
+        #songs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .playlist,
+        .song {
+            padding: 20px;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+            min-width: 180px;
+            max-width: 220px;
+            cursor: pointer;
+            position: relative;
+            font-size: 1rem;
+            font-weight: 500;
+            overflow: hidden;
+            word-break: break-word;
+        }
+
+        .playlist:hover,
+        .song:hover {
+            background: linear-gradient(135deg, #007bff, #00d4ff);
+            color: white;
+            transform: translateY(-7px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .playlist::before,
+        .song::before {
+            position: absolute;
+            top: 12px;
+            left: 15px;
+            font-size: 28px;
+        }
+
+        .playlist::before {
+            content: "📁";
+        }
+
+        .song::before {
+            content: "🎶";
+        }
+
+        audio {
+            display: block;
+            margin: 30px auto;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            background: white;
+            padding: 10px;
+        }
+
+        /* Scrollable if too many */
+        #playlists,
+        #songs {
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.4);
+        }
+    </style>
+    <style>
+        /* Search Bar */
+        .searchBar {
+            width: 80%;
+            color: rgba(0, 123, 255, 0.877);
+            padding: 12px 20px;
+            margin: 20px auto;
+            display: block;
+            border: 2px solid #ccc;
+            border-radius: 20px;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease-in-out;
+        }
+
+        #search-bar:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Modal (Glass Effect) */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            backdrop-filter: blur(10px);
+            background: rgba(0, 0, 0, 0.4);
+            overflow: auto;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 80%;
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            color: white;
+            text-align: center;
+        }
+
+        #close-modal {
+            color: white;
+            float: right;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        #search-results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-card {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            padding: 10px;
+            color: white;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            text-align: left;
+            position: relative;
+        }
+
+        .result-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .result-card p {
+            margin: 10px 0;
+            font-size: 0.95rem;
+            height: 3rem;
+            overflow: hidden;
+        }
+
+        .result-card button {
+            width: 100%;
+            padding: 10px;
+            background: #a775b9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .result-card button:hover {
+            background: #b01bc7;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <h1>🎵 My Music Library</h1>
+    <div id="playlists"></div>
+    <!-- Search Bar -->
+    <button type="text" class="searchBar" onclick=openModal()>Search Me...</button>
+
+    <!-- Glass Popup Modal -->
+    <div id="search-modal" class="modal">
+        <div class="modal-content">
+            <input type="text" id="search-bar" class="searchBar" placeholder="Search for songs on YouTube..." />
+            <span id="close-modal">&times;</span>
+            <h3>Search Results</h3>
+            <div id="search-results"></div>
+        </div>
+    </div>
+
+
+    <h2 id="current-playlist"></h2>
+    <div id="songs"></div>
+
+    <!-- <audio id="audio-player" controls></audio> -->
+    <div id="audio-player-container">
+        <audio id="audio-player"></audio>
+
+        <div class="controls">
+            <button id="prev-btn">⏮️</button>
+            <button id="play-btn">▶️</button>
+            <button id="next-btn">⏭️</button>
+            <button id="shuffle-btn">🔀</button>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5">
+        </div>
+
+        <div id="current-song-name">No Song Playing</div>
+    </div>
+
+
+    <script>
+        // Load playlists dynamically
+        async function loadPlaylists() {
+            const res = await fetch('http://127.0.0.1:5000/playlists');
+            const playlists = await res.json();
+            const container = document.getElementById('playlists');
+            container.innerHTML = '';
+            playlists.forEach(playlist => {
+                const div = document.createElement('div');
+                div.textContent = playlist;
+                div.className = 'playlist';
+                div.onclick = () => loadSongs(playlist);
+                container.appendChild(div);
+            });
+        }
+
+        // Load songs of selected playlist
+        async function loadSongs(playlist) {
+            document.getElementById('current-playlist').textContent = 'Playlist: ' + playlist;
+            const res = await fetch(`http://127.0.0.1:5000/playlist/${playlist}`);
+            const songs = await res.json();
+            const container = document.getElementById('songs');
+            container.innerHTML = '';
+            songs.forEach(song => {
+                const div = document.createElement('div');
+                div.textContent = song;
+                div.className = 'song';
+                div.onclick = () => playSong(playlist, song);
+                container.appendChild(div);
+            });
+        }
+
+        // Play selected song
+        function playSong(playlist, song) {
+            const audio = document.getElementById('audio-player');
+            const encodedSong = encodeURIComponent(song);
+            const url = ` http://127.0.0.1:5000/music/${playlist}/${encodedSong}`;
+            console.log('Playing:', url);
+            audio.src = url;
+            audio.play().catch(err => console.error('Error playing:', err));
+        }
+
+        loadPlaylists();
+    </script>
+    <script>
+        // Load playlists dynamically (already present)
+        async function loadPlaylists() {
+            const res = await fetch('http://127.0.0.1:5000/playlists');
+            const playlists = await res.json();
+            const container = document.getElementById('playlists');
+            container.innerHTML = '';
+            playlists.forEach(playlist => {
+                const div = document.createElement('div');
+                div.textContent = playlist;
+                div.className = 'playlist';
+                div.onclick = () => loadSongs(playlist);
+                container.appendChild(div);
+            });
+        }
+
+        // Load songs dynamically (already present)
+        async function loadSongs(playlist) {
+            document.getElementById('current-playlist').textContent = 'Playlist: ' + playlist;
+            const res = await fetch(`http://127.0.0.1:5000/playlist/${playlist}`);
+            const songs = await res.json();
+            const container = document.getElementById('songs');
+            container.innerHTML = '';
+            songs.forEach(song => {
+                const div = document.createElement('div');
+                div.textContent = song;
+                div.className = 'song';
+                div.onclick = () => playSong(playlist, song);
+                container.appendChild(div);
+            });
+        }
+
+        // Play selected song (already present)
+        function playSong(playlist, song) {
+            const audio = document.getElementById('audio-player');
+            const encodedSong = encodeURIComponent(song);
+            const url = `http://127.0.0.1:5000/music/${playlist}/${encodedSong}`;
+            audio.src = url;
+            audio.play().catch(err => console.error('Error playing:', err));
+        }
+
+        // ✅ Search YouTube
+        document.getElementById('search-bar').addEventListener('input', async function () {
+            const query = this.value;
+            const resultsContainer = document.getElementById('search-results');
+            resultsContainer.innerHTML = '';
+
+            if (query.length < 3) return;  // Wait until at least 3 chars
+
+            const res = await fetch(`http://127.0.0.1:5000/search?query=${encodeURIComponent(query)}`);
+            const results = await res.json();
+
+            // results.forEach(result => {
+            //     const div = document.createElement('div');
+            //     div.className = 'song';  // reuse song styling
+            //     div.innerHTML = 
+            //     <img src="${result.thumbnail}" alt="Thumbnail" style="width: 100%; border-radius: 12px;">
+            //     <p>${result.title}</p>
+            //     <button onclick="downloadSong('${result.url.replace(/'/g, "\\'")}')">Download</button>
+            // ;
+            //     resultsContainer.appendChild(div);
+            // });
+        });
+
+        // ✅ Download selected song
+        async function downloadSong(url) {
+            const res = await fetch('http://127.0.0.1:5000/download', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: ` ${url} ` })
+            });
+
+            const result = await res.json();
+            alert(result.message + ': ' + result.filename);
+            loadPlaylists();  // refresh playlists to show new downloaded song if needed
+        }
+
+        loadPlaylists();
+    </script>
+    <script>
+        const searchBar = document.getElementById('search-bar');
+        const searchModal = document.getElementById('search-modal');
+        const searchResults = document.getElementById('search-results');
+        const closeModal = document.getElementById('close-modal');
+
+        // Open Modal
+        function openModal() {
+            searchModal.style.display = 'block';
+        }
+
+        // Close Modal
+        closeModal.onclick = () => {
+            searchModal.style.display = 'none';
+        };
+
+        // Close Modal on Outside Click
+        window.onclick = (e) => {
+            if (e.target === searchModal) {
+                searchModal.style.display = 'none';
+            }
+        };
+
+        // Search YouTube
+        let debounceTimeout;
+        searchBar.addEventListener('input', function () {
+            const query = this.value.trim();
+
+            if (debounceTimeout) clearTimeout(debounceTimeout);
+
+            if (query.length < 3) {
+                searchResults.innerHTML = ''; // Clear results if query too short
+                return;
+            }
+
+            debounceTimeout = setTimeout(async () => {
+                openModal(); // Show modal on search
+                const res = await fetch(`http://127.0.0.1:5000/search?query=${encodeURIComponent(query)}`);
+                const results = await res.json();
+
+                searchResults.innerHTML = ''; // Clear previous
+
+                results.forEach(result => {
+                    const videoUrl = result.url; // Assuming backend returns only video ID
+                    const videoId = videoUrl.split('v=')[1].split('&')[0]; // Extract video ID safely
+                    const thumbnail = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                    console.log(thumbnail)
+
+                    const card = document.createElement('div');
+                    card.className = 'result-card';
+                    card.innerHTML =
+                        `<img src="${thumbnail}" alt="Thumbnail">
+                            <p>${result.title}</p>
+                            <button onclick="downloadSong('${videoId}')">Download</button>`
+                        ;
+                    searchResults.appendChild(card);
+                });
+            }, 500); // Debounce time 500ms
+        });
+
+        // Download YouTube Song
+        async function downloadSong(url) {
+            const res = await fetch('http://127.0.0.1:5000/download', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ url: `https://www.youtube.com/watch?v=${url}` })
+            });
+
+            const result = await res.json();
+            alert(result.message + ': ' + result.filename);
+            // Optionally reload playlists to show new song
+        }
+    </script>
+
+    <script>
+        const audioPlayer = document.getElementById('audio-player');
+        const playBtn = document.getElementById('play-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const prevBtn = document.getElementById('prev-btn');
+        const shuffleBtn = document.getElementById('shuffle-btn');
+        const volumeSlider = document.getElementById('volume-slider');
+        const songNameDiv = document.getElementById('current-song-name');
+
+        // Songs list (replace with actual file URLs or server paths)
+        const songs = [
+            { name: "Song 1", src: "music/song1.mp3" },
+            { name: "Song 2", src: "music/song2.mp3" },
+            { name: "Song 3", src: "music/song3.mp3" },
+        ];
+
+        let currentIndex = 0;
+        let isPlaying = false;
+
+        function loadSong(index) {
+            audioPlayer.src = songs[index].src;
+            songNameDiv.textContent = songs[index].name;
+            audioPlayer.load();
+            if (isPlaying) {
+                audioPlayer.play();
+            }
+        }
+
+        function playPause() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+                isPlaying = true;
+                playBtn.textContent = '⏸️';
+            } else {
+                audioPlayer.pause();
+                isPlaying = false;
+                playBtn.textContent = '▶️';
+            }
+        }
+
+        function nextSong() {
+            currentIndex = (currentIndex + 1) % songs.length;
+            loadSong(currentIndex);
+        }
+
+        function prevSong() {
+            currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+            loadSong(currentIndex);
+        }
+
+        function shuffleSong() {
+            let randomIndex = Math.floor(Math.random() * songs.length);
+            while (randomIndex === currentIndex && songs.length > 1) {
+                randomIndex = Math.floor(Math.random() * songs.length);
+            }
+            currentIndex = randomIndex;
+            loadSong(currentIndex);
+        }
+
+        // Event Listeners
+        playBtn.addEventListener('click', playPause);
+        nextBtn.addEventListener('click', nextSong);
+        prevBtn.addEventListener('click', prevSong);
+        shuffleBtn.addEventListener('click', shuffleSong);
+        volumeSlider.addEventListener('input', () => {
+            audioPlayer.volume = volumeSlider.value;
+        });
+
+        // Spacebar Play/Pause
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                e.preventDefault();
+                playPause();
+            }
+        });
+
+        // Auto play next on end
+        audioPlayer.addEventListener('ended', nextSong);
+
+        // Load the first song
+        loadSong(currentIndex);
+    </script>
+
+
+</body>
+
+</html>

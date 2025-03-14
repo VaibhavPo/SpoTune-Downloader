@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Spotify Playlist Downloader</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #eef2f3, #ffffff);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: #222;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        input {
+            padding: 15px 20px;
+            margin: 15px 0;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: 0.3s ease;
+            outline: none;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        input:focus {
+            border-color: #5a67d8;
+            box-shadow: 0 0 10px rgba(90, 103, 216, 0.3);
+            background: #fff;
+        }
+
+        button {
+            padding: 15px 20px;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 600px;
+            border: none;
+            border-radius: 12px;
+            background: #5a67d8;
+            color: white;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 16px rgba(90, 103, 216, 0.25);
+        }
+
+        button:hover {
+            background: #434190;
+            box-shadow: 0 8px 20px rgba(67, 65, 144, 0.3);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .playlist-meta {
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .playlist-meta h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #444;
+        }
+
+        .playlist-meta p {
+            margin: 6px 0;
+            color: #555;
+        }
+
+        .track {
+            margin: 18px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid #ddd;
+            border-radius: 16px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 600px;
+            min-width: 500px;
+            transition: all 0.3s ease;
+        }
+
+        .track:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        .track strong {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 6px;
+            font-size: 17px;
+            color: #333;
+        }
+
+        .track em {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .track button {
+            margin-top: 10px;
+            width: auto;
+            padding: 10px 18px;
+            font-size: 14px;
+        }
+
+        .downloaded {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .downloaded a {
+            color: #38a169;
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+        .downloaded a:hover {
+            text-decoration: underline;
+        }
+
+        header,
+        footer {
+            width: 100%;
+            max-width: 1200px;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.8rem;
+            color: #222;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: #555;
+            margin-top: 8px;
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 20px 0;
+            font-size: 0.9rem;
+            color: #777;
+            border-top: 1px solid #ddd;
+        }
+
+        footer a {
+            color: #5a67d8;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+
+            input,
+            button,
+            .playlist-meta,
+            .track {
+                max-width: 95%;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+
+
+
+<body>
+
+    <header>
+        <h1>SpoTune Downloader</h1>
+        <p>Download your favorite playlists in MP3 format directly</p>
+    </header>
+
+    <input type="text" id="playlistUrl" placeholder="Enter Spotify Playlist URL" />
+    <button onclick="fetchPlaylist()">Fetch Playlist</button>
+
+
+    <div id="playlistMeta" class="playlist-meta" style="display:none;"></div>
+    <button id="downloadAllBtn" onclick="downloadAllSongs()" style="display:none;">Download All Songs</button>
+    <div id="tracks"></div>
+
+
+    <script>
+        let currentFolder = '';
+
+        async function fetchPlaylist() {
+            const url = document.getElementById('playlistUrl').value;
+            if (!url) return alert('Please enter a Spotify playlist URL.');
+
+            try {
+                // Fetch playlist metadata and folder
+                const metaResponse = await fetch(`http://127.0.0.1:8080/api/playlist?url=${encodeURIComponent(url)}`);
+                const metaData = await metaResponse.json();
+                if (metaData.status !== 'success') throw new Error(metaData.message);
+
+                const { metadata, folder } = metaData;
+                currentFolder = folder;
+
+                // Display playlist metadata
+                const metaDiv = document.getElementById('playlistMeta');
+                metaDiv.innerHTML = `<h3>${metadata.name}</h3>
+                <p>By: ${metadata.owner}</p>
+                <p>Total Tracks: ${metadata.total_tracks}</p>`;
+                metaDiv.style.display = 'block';
+
+                // Fetch and display track details
+                const tracksResponse = await fetch(`http://127.0.0.1:8080/api/playlist/details?url=${encodeURIComponent(url)}`);
+                const tracksData = await tracksResponse.json();
+                if (tracksData.status !== 'success') throw new Error(tracksData.message);
+
+                const tracksDiv = document.getElementById('tracks');
+                tracksDiv.innerHTML = '';
+                tracksData.tracks.forEach((track, index) => {
+                    const trackElement = document.createElement('div');
+                    trackElement.className = 'track';
+                    trackElement.innerHTML = `
+                        <strong>${index + 1}. ${track.name}</strong><br>
+                        <em>${track.artists}</em><br>
+                        <button onclick="downloadSong('${track.name}', '${track.artists}', this)">Download</button>
+                        <div class="downloaded"></div>
+                    `;
+                    tracksDiv.appendChild(trackElement);
+                });
+
+                // Show "Download All" button
+                document.getElementById('downloadAllBtn').style.display = 'block';
+
+            } catch (err) {
+                alert('Error: ' + err.message);
+            }
+        }
+
+        async function downloadSong(name, artist, button) {
+            button.disabled = true;
+            button.innerText = 'Downloading...';
+
+            try {
+                const response = await fetch('http://127.0.0.1:8080/api/download', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, artist, folder: currentFolder })
+                });
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    const downloadDiv = button.nextElementSibling;
+                    downloadDiv.innerHTML = `<a href="${data.url}" download>Download Ready: ${data.filename}</a>`;
+                } else {
+                    throw new Error(data.message);
+                }
+
+            } catch (err) {
+                alert('Download failed: ' + err.message);
+            }
+
+            button.innerText = 'Download';
+            button.disabled = false;
+        }
+
+        async function downloadAllSongs() {
+            const trackElements = document.querySelectorAll('.track');
+            for (const trackEl of trackElements) {
+                const name = trackEl.querySelector('strong').innerText.split('. ')[1];
+                const artist = trackEl.querySelector('em').innerText;
+                const button = trackEl.querySelector('button');
+
+                // Call download for each track with a delay to avoid overwhelming backend
+                await downloadSong(name, artist, button);
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Delay of 2 sec between downloads
+            }
+        }
+    </script>
+    <footer>
+        <p>&copy; 2025 SpoTune Downloader | Built with ❤️ by <a href="">Anu&Vai_bhav</a></p>
+    </footer>
+</body>
+
+</html>

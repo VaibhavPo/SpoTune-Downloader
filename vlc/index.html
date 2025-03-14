@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>🎶 Music Player App</title>
+    <link rel="stylesheet" href="style.css">
+
+
+</head>
+
+<body>
+
+    <h1>🎵 My Music Library</h1>
+    <div id="playlists"></div>
+    <!-- Search Bar -->
+    <button type="text" class="searchBar" onclick=openModal()>Search Me...</button>
+
+    <!-- Glass Popup Modal -->
+    <div id="search-modal" class="modal">
+        <div class="modal-content">
+            <input type="text" id="search-bar" class="searchBar" placeholder="Search for songs on YouTube..." />
+            <span id="close-modal">&times;</span>
+            <h3>Search Results</h3>
+            <div id="search-results"></div>
+        </div>
+    </div>
+
+
+    <h2 id="current-playlist"></h2>
+    <div id="songs"></div>
+
+    <!-- <audio id="audio-player" controls></audio> -->
+
+    <div class="music-player">
+        <audio id="audio-player" src="your-song.mp3"></audio>
+
+        <div id="current-song-name">No Song Playing</div> <!-- Move inside for better display -->
+
+        <div class="timeline-container">
+            <span id="current-time">0:00</span>
+            <input type="range" id="timeline" min="0" value="0" step="1">
+            <span id="duration">0:00</span>
+        </div>
+
+        <div class="controls">
+            <button id="prev-btn" title="Previous (←)">⏮️</button>
+            <button id="backward-btn" title="Back 10 sec (↓)">⏪</button>
+            <button id="play-btn" title="Play/Pause (Space)">▶️</button>
+            <button id="forward-btn" title="Forward 10 sec (↑)">⏩</button>
+            <button id="next-btn" title="Next (→)">⏭️</button>
+            <button id="shuffle-btn" title="Shuffle">🔀</button>
+            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.5" title="Volume">
+        </div>
+    </div>
+
+
+    <div id="current-song-name">No Song Playing</div>
+    </div>
+
+
+    <script src="script.js"></script>
+
+
+
+</body>
+
+</html>
