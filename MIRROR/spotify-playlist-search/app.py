@@ -169,11 +169,16 @@ def serve_downloaded_file(folder, filename):
 
 
 #testing routes
-
-@app.route('/api/test-yt-version', methods=['GET'])
-def test_yt_version():
+@app.route('/api/test-yt', methods=['POST'])
+def test_yt():
     try:
-        output = subprocess.check_output(['yt-dlp', '--version'], stderr=subprocess.STDOUT)
+        data = request.json
+        url = data.get('url')
+        if not url:
+            return jsonify({"status": "error", "output": "No URL provided"}), 400
+
+        # Simulate yt-dlp to check if it can fetch video info without downloading
+        output = subprocess.check_output(['yt-dlp', '--simulate', url], stderr=subprocess.STDOUT)
         return jsonify({"status": "success", "output": output.decode()})
     except subprocess.CalledProcessError as e:
         return jsonify({"status": "error", "output": e.output.decode()})
